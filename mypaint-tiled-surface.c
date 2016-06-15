@@ -137,6 +137,14 @@ mypaint_tiled_surface_set_symmetry_state(MyPaintTiledSurface *self, gboolean act
     self->surface_center_x = center_x;
 }
 
+// Same as Symmerry, but for the repeated pattern mode.
+void
+mypaint_tiled_surface_set_pattern_state(MyPaintTiledSurface *self, gboolean active, int pattern_X_size, int pattern_Y_size) {
+    self->surface_do_pattern = active;
+    self->surface_pattern_X_size = pattern_X_size;
+    self->surface_pattern_Y_size = pattern_Y_size;
+}
+
 /**
  * mypaint_tile_request_init:
  *
@@ -596,6 +604,24 @@ int draw_dab (MyPaintSurface *surface, float x, float y,
 
   gboolean surface_modified = FALSE;
 
+  // Pattern pass
+  if(self->surface_do_pattern){
+		const int p_Xsize = self->surface_pattern_X_size;
+		const int p_Ysize = self->surface_pattern_Y_size;
+		// no matter where the user draws, the dabs will land in a range of 0.0 to size		
+		x = circular_wrap(x,p_Xsize); // circular_wrap() in helpers.c from pigmentblending-test branch
+		y = circular_wrap(y,p_Ysize);
+		
+		for (int i = 0; i <= p_Xsize*2; i= i + p_Xsize) {
+			for (int j = 0; j <= p_Ysize*2; j= j + p_Ysize) {
+				if(draw_dab_internal(self, x + i, y + j, radius, color_r, color_g, color_b,
+				opaque, hardness, color_a, aspect_ratio, angle,
+				lock_alpha, colorize)) {
+					surface_modified = TRUE;
+				}			
+			}
+		}
+  } else
   // Normal pass
   if (draw_dab_internal(self, x, y, radius, color_r, color_g, color_b,
                         opaque, hardness, color_a, aspect_ratio, angle,
@@ -747,6 +773,9 @@ mypaint_tiled_surface_init(MyPaintTiledSurface *self,
     self->dirty_bbox.height = 0;
     self->surface_do_symmetry = FALSE;
     self->surface_center_x = 0.0f;
+    self->surface_do_pattern = TRUE; // FIXME: Hardcoded for testing, should hook up with gui
+    self->surface_pattern_X_size = 128; // FIXME: Hardcoded for testing, should hook up with gui
+    self->surface_pattern_Y_size = 128; // FIXME: Hardcoded for testing, should hook up with gui
     self->operation_queue = operation_queue_new();
 }
 

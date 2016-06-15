@@ -41,6 +41,9 @@ struct MyPaintTiledSurface {
     MyPaintTileRequestEndFunction tile_request_end;
     gboolean surface_do_symmetry;
     float surface_center_x;
+    gboolean surface_do_pattern;
+    int surface_pattern_X_size;
+    int surface_pattern_Y_size;
     struct OperationQueue *operation_queue;
     MyPaintRectangle dirty_bbox;
     gboolean threadsafe_tile_requests;
@@ -57,6 +60,11 @@ mypaint_tiled_surface_destroy(MyPaintTiledSurface *self);
 
 void
 mypaint_tiled_surface_set_symmetry_state(MyPaintTiledSurface *self, gboolean active, float center_x);
+
+void
+mypaint_tiled_surface_set_pattern_state(MyPaintTiledSurface *self, gboolean active, int pattern_X_size, int pattern_Y_size);
+
+
 float
 mypaint_tiled_surface_get_alpha (MyPaintTiledSurface *self, float x, float y, float radius);
 
