@@ -577,6 +577,7 @@
         "declination",
         "ascension",
         "viewzoom",
-        "viewrotation"
+        "viewrotation",
+        "flip"
     ]
 }
